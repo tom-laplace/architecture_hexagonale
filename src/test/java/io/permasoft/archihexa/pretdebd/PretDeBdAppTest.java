@@ -13,11 +13,6 @@ public class PretDeBdAppTest {
     }
 
     @Test
-    void shouldFail() {
-        assertThat(false).isTrue();
-    }
-
-    @Test
     void shouldRun() {
         assertThatCode(() -> new PretDeBdApp().run("Hello", "World")).doesNotThrowAnyException();
     }
