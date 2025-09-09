@@ -45,7 +45,19 @@ public class Bd  {
         }
 
         this.emprunteur = emprunteur;
-        this.emprunteur.ajouterEmprunt(id);
         this.state = State.EMPRUNTE;
+    }
+
+    public void retourner(Emprunteur emprunteur) throws Exception {
+        if(this.state != State.EMPRUNTE) {
+            throw new Exception("Bd is not borrowed.");
+        }
+
+        if(!emprunteur.equals(this.getEmprunteur())) {
+            throw new Exception("Bd hasn't been borrowed by the borrower passed in params.");
+        }
+
+        this.emprunteur = null;
+        this.state = State.DISPONIBLE;
     }
 }

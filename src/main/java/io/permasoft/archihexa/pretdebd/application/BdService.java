@@ -27,6 +27,18 @@ public class BdService {
         try {
             Bd bd = this.byId(id).orElseThrow(() -> new AssertionError("bd not found"));
             bd.emprunter(emprunteur);
+            emprunteur.ajouterEmprunt(id);
+            repo.save(bd);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+    }
+
+    public void retourner(Emprunteur emprunteur, UUID id) throws Exception {
+        try {
+            Bd bd = this.byId(id).orElseThrow(() -> new AssertionError("bd not found"));
+            bd.retourner(emprunteur);
+            emprunteur.enleverEmprunt(id);
             repo.save(bd);
         } catch (Exception e) {
             throw new Exception(e);

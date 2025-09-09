@@ -121,4 +121,76 @@ public class BdServiceTest {
         assertThrows(Exception.class, () -> bdService.emprunter(emprunteur, bd.getId())).getMessage()
                 .equals("Bd can't be borrowed, borrower has already max out his borrowing capacity.");
     }
+
+    @Test
+    void doit_pouvoir_retourner_un_emprunt() {
+        UUID id = UUID.randomUUID();
+        Proprietaire proprietaire = new Proprietaire("Dwight");
+        Isbn isbn = new Isbn("978-2012101333");
+        BdService bdService = new BdService(repo);
+        bdService.enregistrer(id, isbn, proprietaire);
+        Bd bd = bdService.byId(id)
+                .orElseThrow(() -> new AssertionError("bd not found"));
+
+        Emprunteur emprunteur = new Emprunteur("Jim", new ArrayList<>());
+
+        try {
+            bdService.emprunter(emprunteur, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            bdService.retourner(emprunteur, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assertThat(bd.getEmprunteur())
+                .usingRecursiveComparison()
+                .isEqualTo(null);
+
+        assertThat(bd.getState())
+                .isEqualTo(Bd.State.DISPONIBLE);
+
+        assertThat(emprunteur.bdsEmpruntees().size())
+                .isEqualTo(0);
+    }
+
+    @Test
+    void ne_doit_pas_pouvoir_retourner_emprunt_si_pas_emprunteur(){
+        UUID id = UUID.randomUUID();
+        Proprietaire proprietaire = new Proprietaire("Dwight");
+        Isbn isbn = new Isbn("978-2012101333");
+        BdService bdService = new BdService(repo);
+        bdService.enregistrer(id, isbn, proprietaire);
+        Bd bd = bdService.byId(id)
+                .orElseThrow(() -> new AssertionError("bd not found"));
+
+        Emprunteur emprunteur = new Emprunteur("Jim", new ArrayList<>());
+        Emprunteur emprunteur2 = new Emprunteur("Pam", new ArrayList<>());
+
+        try {
+            bd.emprunter(emprunteur);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assertThrows(Exception.class, () -> bdService.retourner(emprunteur2, id)).getMessage()
+                .equals("Bd hasn't been borrowed by the borrower passed in params.");
+    }
+
+    @Test
+    void ne_doit_pas_pouvoir_retourner_emprunt_si_livre_pas_emprunter(){
+        UUID id = UUID.randomUUID();
+        Proprietaire proprietaire = new Proprietaire("Dwight");
+        Isbn isbn = new Isbn("978-2012101333");
+        BdService bdService = new BdService(repo);
+        bdService.enregistrer(id, isbn, proprietaire);
+
+        Emprunteur emprunteur = new Emprunteur("Jim", new ArrayList<>());
+
+        assertThrows(Exception.class, () -> bdService.retourner(emprunteur, id)).getMessage()
+                .equals("Bd is not borrowed.");
+    }
 }

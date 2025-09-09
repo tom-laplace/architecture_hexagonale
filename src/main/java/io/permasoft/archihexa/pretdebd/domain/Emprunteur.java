@@ -21,4 +21,8 @@ public record Emprunteur(@NonNull String name, List<UUID> bdsEmpruntees) {
     public void ajouterEmprunt(UUID id) {
         this.bdsEmpruntees.add(id);
     }
+
+    public void enleverEmprunt(UUID id) {
+        this.bdsEmpruntees.removeIf(uuid -> uuid.equals(id));
+    }
 }
